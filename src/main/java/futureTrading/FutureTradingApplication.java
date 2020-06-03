@@ -1,13 +1,13 @@
-package FuturesTrading;
+package futureTrading;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FuturesTradingApplication {
+public class FutureTradingApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FuturesTradingApplication.class, args);
+		SpringApplication.run(FutureTradingApplication.class, args);
 	}
 
 }

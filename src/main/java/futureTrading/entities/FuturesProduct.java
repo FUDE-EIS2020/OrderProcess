@@ -1,4 +1,4 @@
-package FuturesTrading.entities;
+package futureTrading.entities;
 import javax.persistence.*;
 
 @Entity

@@ -1,15 +1,12 @@
-package FuturesTrading.entities;
+package futureTrading.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.List;
+import javax.persistence.*;
+
 
 @Entity
 @Table
-public class Trader {
-
+public class Broker {
   @Id
   @GeneratedValue(generator = "jpa-uuid")
   private String id;
@@ -20,8 +17,10 @@ public class Trader {
   @Column(nullable = false)
   private  String token;
 
-  @Column(nullable = false)
-  private  String compName;
+  @OneToMany(cascade = CascadeType.MERGE,
+      fetch = FetchType.LAZY,
+      targetEntity=FuturesProduct.class)
+  private List<FuturesProduct> products;
 
   public String getId() {
     return id;
@@ -47,11 +46,11 @@ public class Trader {
     this.token = token;
   }
 
-  public String getCompName() {
-    return compName;
+  public List<FuturesProduct> getProducts() {
+    return products;
   }
 
-  public void setCompName(String compName) {
-    this.compName = compName;
+  public void setProducts(List<FuturesProduct> products) {
+    this.products = products;
   }
 }
