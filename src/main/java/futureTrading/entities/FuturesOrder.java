@@ -2,14 +2,20 @@ package futureTrading.entities;
 
 
 import java.util.Date;
+import java.util.UUID;
 import javax.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table
 public class FuturesOrder {
   @Id
-  @GeneratedValue(generator = "jpa-uuid")
-  private String id;
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(
+      name = "UUID",
+      strategy = "org.hibernate.id.UUIDGenerator"
+  )
+  private UUID id;
 
   @ManyToOne(cascade = CascadeType.MERGE,
       fetch = FetchType.LAZY,
@@ -51,14 +57,6 @@ public class FuturesOrder {
 
   @Column(nullable = false)
   private OrderInitiator initiator;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public FuturesProduct getProduct() {
     return product;

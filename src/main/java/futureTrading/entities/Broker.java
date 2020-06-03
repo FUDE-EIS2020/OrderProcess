@@ -1,15 +1,21 @@
 package futureTrading.entities;
 
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 
 @Entity
 @Table
 public class Broker {
   @Id
-  @GeneratedValue(generator = "jpa-uuid")
-  private String id;
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(
+      name = "UUID",
+      strategy = "org.hibernate.id.UUIDGenerator"
+  )
+  private UUID id;
 
   @Column(nullable = false)
   private String name;
@@ -21,14 +27,6 @@ public class Broker {
       fetch = FetchType.LAZY,
       targetEntity=FuturesProduct.class)
   private List<FuturesProduct> products;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public String getName() {
     return name;
