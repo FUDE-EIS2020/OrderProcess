@@ -26,7 +26,7 @@ public class FuturesOrder {
   private Double price;
 
   @Column(nullable = false)
-  private Integer ammount;
+  private Integer amount;
 
   @Column(nullable = false)
   private OrderType orderType;
@@ -82,12 +82,12 @@ public class FuturesOrder {
     this.price = price;
   }
 
-  public Integer getAmmount() {
-    return ammount;
+  public Integer getAmount() {
+    return amount;
   }
 
-  public void setAmmount(Integer ammount) {
-    this.ammount = ammount;
+  public void setAmount(Integer amount) {
+    this.amount = amount;
   }
 
   public OrderType getOrderType() {
@@ -174,7 +174,7 @@ public class FuturesOrder {
     SELLER, BUYER
   }
 
-  // todo: add more api 'bout this enum
+  // todo: add more api about this enum
   public enum OrderType {
     MARKET(0), LIMIT(1), STOP(2), CANCEL(-1);
     private Integer index;
