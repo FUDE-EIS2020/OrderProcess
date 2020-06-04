@@ -2,6 +2,7 @@ package futureTrading;
 
 import futureTrading.entities.Trader;
 import futureTrading.repositories.TraderRepo;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class FutureTradingApplicationTests {
 		newGuy.setName("WXM");
 		newGuy.setToken("123123");
 		this.traderRepo.save(newGuy);
+		List<Trader> traders = this.traderRepo.findAll();
+		System.out.println(traders.get(0).getId());
 	}
 
 }

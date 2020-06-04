@@ -20,6 +20,14 @@ public class FuturesProduct {
   @Column(nullable = false)
   String period;
 
+  public UUID getId() {
+    return id;
+  }
+
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
   public String getName() {
     return name;
   }

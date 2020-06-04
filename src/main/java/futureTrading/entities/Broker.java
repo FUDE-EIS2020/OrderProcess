@@ -28,6 +28,14 @@ public class Broker {
       targetEntity=FuturesProduct.class)
   private List<FuturesProduct> products;
 
+  public UUID getId() {
+    return id;
+  }
+
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
   public String getName() {
     return name;
   }

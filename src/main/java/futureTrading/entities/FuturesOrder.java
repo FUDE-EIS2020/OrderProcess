@@ -58,6 +58,14 @@ public class FuturesOrder {
   @Column(nullable = false)
   private OrderInitiator initiator;
 
+  public UUID getId() {
+    return id;
+  }
+
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
   public FuturesProduct getProduct() {
     return product;
   }
