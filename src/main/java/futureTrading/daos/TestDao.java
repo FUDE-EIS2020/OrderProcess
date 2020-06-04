@@ -39,4 +39,8 @@ public class TestDao {
             (FuturesOrder.OrderType orderType, Broker broker) {
         return futuresOrderRepo.findAllByOrderTypeAndBroker(orderType, broker);
     }
+
+    public List<FuturesProduct> getAll() {
+        return futuresProductRepo.findAll();
+    }
 }
