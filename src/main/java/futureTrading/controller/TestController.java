@@ -61,7 +61,7 @@ public class TestController {
 
     //  TODO: LOG
     @OnClose
-    public void onClose(Session session, @PathParam("username") String username) {
+    public void onClose( @PathParam("username") String username) {
         userSessionMap.remove(username);
         //log.info("Connection closed");
     }
@@ -72,9 +72,12 @@ public class TestController {
         log.info("Connection error");
     }
 
-    //  send message to every username
+    // send message to every username
+    @ResponseBody
     @GetMapping(path = "/sendTextTest")
     public void sendTextTest() throws IOException {
+        //return "123";
+        System.out.println("lined text test");
         for(Map.Entry<String, Session> entry:userSessionMap.entrySet()) {
                 entry.getValue().getBasicRemote().sendText("尝试从后端发送消息");
         }
