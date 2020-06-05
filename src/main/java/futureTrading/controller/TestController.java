@@ -49,21 +49,12 @@ public class TestController {
     TestDao testDao;
 
     //  TODO: LOG
-    @ResponseBody
     @OnOpen
-    public String onOpen(Session session, @PathParam("username") String username) {
-        if(userSessionMap.contains(username)) {return "connection failed";}
+    public void onOpen(Session session, @PathParam("username") String username) {
+        //if(userSessionMap.contains(username)) {return;}
         userSessionMap.put(username,session);
         //log.info("Connection connected");
         //log.info("username: "+ username + "\t session: " + session.toString());
-        return "connect";
-    }
-
-    //  TODO: LOG
-    @OnClose
-    public void onClose( @PathParam("username") String username) {
-        userSessionMap.remove(username);
-        //log.info("Connection closed");
     }
 
     // 传输消息错误调用的方法
@@ -78,8 +69,10 @@ public class TestController {
     public void sendTextTest() throws IOException {
         //return "123";
         System.out.println("lined text test");
+       // Session s = userSessionMap.get("wxm");
+        //s.getBasicRemote().sendText("尝试从后端发送消息");
         for(Map.Entry<String, Session> entry:userSessionMap.entrySet()) {
-                entry.getValue().getBasicRemote().sendText("尝试从后端发送消息");
+            entry.getValue().getBasicRemote().sendText("尝试从后端发送消息");
         }
     }
 
@@ -95,4 +88,10 @@ public class TestController {
     }
 
 
+    //  TODO: LOG
+    @OnClose
+    public void onClose( @PathParam("username") String username) {
+        userSessionMap.remove(username);
+        //log.info("Connection closed");
+    }
 }
