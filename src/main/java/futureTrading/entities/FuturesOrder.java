@@ -155,18 +155,22 @@ public class FuturesOrder {
   }
 
   public enum OrderState {
-    PENDING(false), FINISHED(true);
-    private Boolean isFinished;
-    private OrderState(Boolean isFinished) {
-      this.isFinished = isFinished;
+    UNLISTED(0), PENDING(1), FINISHED(-1);
+    private Integer orderState;
+    private OrderState(Integer orderState) {
+      this.orderState = orderState;
     }
 
     public Boolean isFinished() {
-      return this.isFinished;
+      return this.orderState == -1;
     }
 
     public Boolean isPending() {
-      return !this.isFinished;
+      return this.orderState == 1;
+    }
+
+    public Boolean isUnlisted() {
+      return this.orderState == 0;
     }
   }
 
