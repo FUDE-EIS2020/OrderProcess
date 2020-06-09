@@ -14,6 +14,9 @@ public class OrderInMDDto {
     // 表示这个单是买单或卖单，属性值'buy' or 'sell'
     private String type;
 
+    // 属性值"market" "limit" "stop" "cancel"
+    private String orderType;
+
     public Double getPrice() {
         return price;
     }

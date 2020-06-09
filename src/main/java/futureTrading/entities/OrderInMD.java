@@ -16,6 +16,9 @@ public class OrderInMD implements Serializable {
     // 表示这个单是买单或卖单，属性值'buy' or 'sell'
     private String type;
 
+    // 表示这个是一个market order或者stop order，属性值为"M" or "S"
+    private String tag;
+
     public UUID getId() {
         return id;
     }
@@ -62,5 +65,13 @@ public class OrderInMD implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }
