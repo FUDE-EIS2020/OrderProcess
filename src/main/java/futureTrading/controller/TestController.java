@@ -48,12 +48,13 @@ public class TestController {
     public void redisSet(@RequestBody JSONObject jsonObject) {
         System.out.println("arrive controller redis set! \n");
         System.out.println(jsonObject);
-        redisService.setOrder(jsonObject.getString("key"), jsonObject.getJSONObject("order"));
+        JSONObject jso = jsonObject.getJSONObject("order");
+        redisService.setOrder(jsonObject.getString("key"), JSONObject.parseObject(String.valueOf(jso),OrderInMD.class));
     }
 
     @ResponseBody
     @GetMapping(path = "/redisGet")
-    public JSONObject redisGet(@RequestParam("key") String key) {
+    public List<Object> redisGet(@RequestParam("key") String key) {
         System.out.println("arrive controller redis get! \n");
         return redisService.getOrder(key);
     }
