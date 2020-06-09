@@ -1,45 +1,78 @@
 package futureTrading.serviceImpl;
 
+import futureTrading.entities.OrderInMD;
 import futureTrading.service.RedisService;
+import org.aspectj.weaver.ast.Or;
+import org.hibernate.criterion.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+
+// Sort by price: largest in head
+class SortByPriceLH implements Comparator<OrderInMD> {
+    @Override
+    public int compare(OrderInMD o1, OrderInMD o2) {
+        if (o1.getPrice() > o2.getPrice()) {
+            return -1;
+        }
+        return 0;
+    }
+}
+
+// Sort by price: smallest in head
+class SortByPriceSH implements Comparator<OrderInMD> {
+    @Override
+    public int compare(OrderInMD o1, OrderInMD o2) {
+        if (o1.getPrice() > o2.getPrice()) {
+            return 0;
+        }
+        return -1;
+    }
+}
 
 @Service
 public class RedisServiceImpl implements RedisService {
 
     @Resource
-    private RedisTemplate<String, List<Object>> redisTemplate;
-
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisTemplate<String, List<OrderInMD>> redisTemplate;
 
     @Override
-    public void setOrder(String brokerID_productID, Object orderInMD) {
-
-        //stringRedisTemplate.opsForValue().set(key, String.valueOf(orderInMD));
-        List<Object> list = redisTemplate.opsForValue().get(brokerID_productID);
-        if (list != null) {
-            list.add(orderInMD);
-            redisTemplate.opsForValue().set(brokerID_productID, list);
-        } else {
-            List<Object> newList = new ArrayList<Object>();
-            newList.add(orderInMD);
-            redisTemplate.opsForValue().set(brokerID_productID, newList);
-        }
-        //RedisSerializer redisSerializer = new StringRedisSerializer();
-        //redisTemplate.setKeySerializer(redisSerializer);
-        //ValueOperations<String, Object> vo = redisTemplate.opsForValue();
-        //vo.set(key, orderInMD);
+    public void setOrder(String brokerId, String productId, List<OrderInMD> orderInMDList) {
+        String key = brokerId + productId;
+        redisTemplate.opsForValue().set(key, orderInMDList);
     }
 
     @Override
-    public List<Object> getOrder(String key) {
-        //String jsonString =  stringRedisTemplate.opsForValue().get(key);
+    public List<OrderInMD> getOrder(String brokerId, String productId) {
+        String key = brokerId + productId;
         return redisTemplate.opsForValue().get(key);
+    }
+
+    @Override
+    public List<List<OrderInMD>> splitOrdersInMD(String brokerId, String productId) {
+        List<OrderInMD> allList = getOrder(brokerId, productId);
+        List<OrderInMD> sellerOrderInMD = new ArrayList<>();
+        List<OrderInMD> buyerOrderInMD = new ArrayList<>();
+        for (OrderInMD tmpOrder : allList) {
+            if ((!tmpOrder.getTag().equals("M")) && (!tmpOrder.getTag().equals("S"))) {
+                if (tmpOrder.getType().equals("buy")) {
+                    buyerOrderInMD.add(tmpOrder);
+                }
+                else sellerOrderInMD.add(tmpOrder);
+            }
+        }
+
+        buyerOrderInMD.sort(new SortByPriceLH());
+        sellerOrderInMD.sort(new SortByPriceSH());
+
+        List<List<OrderInMD>> returnList = new ArrayList<>();
+        returnList.add(buyerOrderInMD);
+        returnList.add(sellerOrderInMD);
+        return returnList;
     }
 }

@@ -9,6 +9,7 @@ package futureTrading.controller;
  *
  */
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import futureTrading.daos.TestDao;
 import futureTrading.entities.FuturesProduct;
@@ -31,7 +32,6 @@ public class TestController {
     @Resource
     RedisService redisService;
 
-
     @ResponseBody
     @GetMapping(path = "/getAllProducts")
     public List<FuturesProduct> getOneProduct() {
@@ -44,14 +44,23 @@ public class TestController {
     public void redisSet(@RequestBody JSONObject jsonObject) {
         System.out.println("arrive controller redis set! \n");
         System.out.println(jsonObject);
-        JSONObject jso = jsonObject.getJSONObject("order");
-        redisService.setOrder(jsonObject.getString("key"), JSONObject.parseObject(String.valueOf(jso), OrderInMD.class));
+        JSONArray jsonArray = jsonObject.getJSONArray("order");//jsonObject.getJSONObject("order");
+        redisService.setOrder(jsonObject.getString("key1"), jsonObject.getString("key2"),
+                JSONObject.parseArray(jsonArray.toString(), OrderInMD.class));
+
     }
 
     @ResponseBody
     @GetMapping(path = "/redisGet")
-    public List<Object> redisGet(@RequestParam("key") String key) {
+    public List<OrderInMD> redisGet(@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
         System.out.println("arrive controller redis get! \n");
-        return redisService.getOrder(key);
+        return redisService.getOrder(key1,key2);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/redisSplit")
+    public List<List<OrderInMD>> redisSplit(@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
+        System.out.println("arrive controller redis split! \n");
+        return redisService.splitOrdersInMD(key1,key2);
     }
 }
