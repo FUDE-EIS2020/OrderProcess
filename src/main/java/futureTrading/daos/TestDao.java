@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 
 
@@ -27,12 +26,12 @@ public class TestDao {
     @Autowired
     FuturesProductRepo futuresProductRepo;
 
-    public FuturesProduct getProductByID(UUID uuid) {
-        return futuresProductRepo.getById(uuid);
+    public FuturesProduct getProductByID(Long id) {
+        return futuresProductRepo.getById(id);
     }
 
-    public FuturesOrder getOrderByID(UUID uuid) {
-        return futuresOrderRepo.getById(uuid);
+    public FuturesOrder getOrderByID(Long id) {
+        return futuresOrderRepo.getById(id);
     }
 
     public List<FuturesOrder> getAllOrderByTypeAndBroker

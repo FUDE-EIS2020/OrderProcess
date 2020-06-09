@@ -2,7 +2,6 @@ package futureTrading.serviceImpl;
 
 import futureTrading.entities.OrderInMD;
 import futureTrading.service.MarketDepthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

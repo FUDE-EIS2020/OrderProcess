@@ -3,6 +3,8 @@ package futureTrading.dto;
 import java.util.Date;
 
 public class OrderInMDDto {
+    private String productId;
+    private String brokerId;
     private Double price;
     private Integer amount;
 
@@ -16,6 +18,22 @@ public class OrderInMDDto {
 
     // 属性值"market" "limit" "stop" "cancel"
     private String orderType;
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public String getBrokerId() {
+        return brokerId;
+    }
+
+    public void setBrokerId(String brokerId) {
+        this.brokerId = brokerId;
+    }
 
     public Double getPrice() {
         return price;
@@ -55,5 +73,13 @@ public class OrderInMDDto {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 }

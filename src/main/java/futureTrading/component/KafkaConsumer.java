@@ -23,7 +23,7 @@ public class KafkaConsumer {
             Object o = kafkaMassage.get();
             String msg = (String) o;
 
-            ObjectMapper mapper=new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper();
 
             try {
                 // get order from kafka
@@ -32,8 +32,7 @@ public class KafkaConsumer {
                 orderProcessService.processOrder(dto);
                 // notify gateway after processing
                 orderProcessService.notifyGateWay();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("process order error");
             }
             System.out.println("receiving: " + msg);

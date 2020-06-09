@@ -12,4 +12,5 @@ public interface RedisService {
     List<OrderInMD> getOrder(String brokerId, String productId);
 
     List<List<OrderInMD>> splitOrdersInMD(String brokerId, String productId);
+
 }
