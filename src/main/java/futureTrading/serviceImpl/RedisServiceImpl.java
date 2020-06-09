@@ -21,27 +21,12 @@ public class RedisServiceImpl implements RedisService {
     @Resource
     private RedisTemplate<String, List<Object>> redisTemplate;
 
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    //@Resource
+    //private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public void setOrder(String brokerID_productID, Object orderInMD) {
-
-        //stringRedisTemplate.opsForValue().set(key, String.valueOf(orderInMD));
-        List<Object> list = redisTemplate.opsForValue().get(brokerID_productID);
-        if(list != null) {
-            list.add(orderInMD);
-            redisTemplate.opsForValue().set(brokerID_productID, list);
-        }
-        else {
-            List<Object> newList = new ArrayList<Object>();
-            newList.add(orderInMD);
-            redisTemplate.opsForValue().set(brokerID_productID, newList);
-        }
-        //RedisSerializer redisSerializer = new StringRedisSerializer();
-        //redisTemplate.setKeySerializer(redisSerializer);
-        //ValueOperations<String, Object> vo = redisTemplate.opsForValue();
-        //vo.set(key, orderInMD);
+    public void setOrder(String brokerID_productID, List<Object> orderInMDList) {
+        redisTemplate.opsForValue().set(brokerID_productID, orderInMDList);
     }
 
     @Override

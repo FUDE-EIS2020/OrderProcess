@@ -9,6 +9,7 @@ package futureTrading.controller;
  *
  */
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import futureTrading.daos.TestDao;
 import futureTrading.entities.FuturesOrder;
@@ -35,7 +36,6 @@ public class TestController {
     @Resource
     RedisService redisService;
 
-
     @ResponseBody
     @GetMapping(path = "/getAllProducts")
     public List<FuturesProduct> getOneProduct() {
@@ -48,8 +48,9 @@ public class TestController {
     public void redisSet(@RequestBody JSONObject jsonObject) {
         System.out.println("arrive controller redis set! \n");
         System.out.println(jsonObject);
-        JSONObject jso = jsonObject.getJSONObject("order");
-        redisService.setOrder(jsonObject.getString("key"), JSONObject.parseObject(String.valueOf(jso),OrderInMD.class));
+        JSONArray jsonArray = jsonObject.getJSONArray("order");//jsonObject.getJSONObject("order");
+        redisService.setOrder(jsonObject.getString("key"),
+                JSONObject.parseArray(jsonArray.toString(), Object.class));
     }
 
     @ResponseBody
