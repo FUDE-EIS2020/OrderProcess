@@ -9,16 +9,18 @@ package futureTrading.controller;
  *
  */
 
+import com.alibaba.fastjson.JSONObject;
 import futureTrading.daos.TestDao;
 import futureTrading.entities.FuturesOrder;
 import futureTrading.entities.FuturesProduct;
+import futureTrading.entities.OrderInMD;
+import futureTrading.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -27,8 +29,12 @@ import java.util.List;
 @RequestMapping(path = "/test")
 public class TestController {
 
-    @Autowired
+    @Resource
     TestDao testDao;
+
+    @Resource
+    RedisService redisService;
+
 
     @ResponseBody
     @GetMapping(path = "/getAllProducts")
@@ -37,4 +43,18 @@ public class TestController {
         return testDao.getAll();
     }
 
+    @ResponseBody
+    @PostMapping(path = "/redisSet")
+    public void redisSet(@RequestBody JSONObject jsonObject) {
+        System.out.println("arrive controller redis set! \n");
+        System.out.println(jsonObject);
+        redisService.setOrder(jsonObject.getString("key"), jsonObject.getJSONObject("order"));
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/redisGet")
+    public JSONObject redisGet(@RequestParam("key") String key) {
+        System.out.println("arrive controller redis get! \n");
+        return redisService.getOrder(key);
+    }
 }
