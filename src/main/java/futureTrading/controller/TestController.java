@@ -49,14 +49,21 @@ public class TestController {
         System.out.println("arrive controller redis set! \n");
         System.out.println(jsonObject);
         JSONArray jsonArray = jsonObject.getJSONArray("order");//jsonObject.getJSONObject("order");
-        redisService.setOrder(jsonObject.getString("key"),
-                JSONObject.parseArray(jsonArray.toString(), Object.class));
+        redisService.setOrder(jsonObject.getString("key1"), jsonObject.getString("key2"),
+                JSONObject.parseArray(jsonArray.toString(), OrderInMD.class));
     }
 
     @ResponseBody
     @GetMapping(path = "/redisGet")
-    public List<Object> redisGet(@RequestParam("key") String key) {
+    public List<OrderInMD> redisGet(@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
         System.out.println("arrive controller redis get! \n");
-        return redisService.getOrder(key);
+        return redisService.getOrder(key1,key2);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/redisSplit")
+    public List<List<OrderInMD>> redisSplit(@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
+        System.out.println("arrive controller redis split! \n");
+        return redisService.splitOrdersInMD(key1,key2);
     }
 }
