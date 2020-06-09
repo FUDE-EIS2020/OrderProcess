@@ -1,46 +1,41 @@
 package futureTrading.entities;
-import java.util.UUID;
-import javax.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table
 public class FuturesProduct {
-  @Id
-  @GeneratedValue(generator = "UUID")
-  @GenericGenerator(
-      name = "UUID",
-      strategy = "org.hibernate.id.UUIDGenerator"
-  )
-  private UUID id;
+    @Column(nullable = false)
+    String name;
+    @Column(nullable = false)
+    String period;
+    @Id
+    private Long id;
 
-  @Column(nullable = false)
-  String name;
+    public Long getId() {
+        return id;
+    }
 
-  @Column(nullable = false)
-  String period;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public UUID getId() {
-    return id;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setId(UUID id) {
-    this.id = id;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getPeriod() {
+        return period;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getPeriod() {
-    return period;
-  }
-
-  public void setPeriod(String period) {
-    this.period = period;
-  }
+    public void setPeriod(String period) {
+        this.period = period;
+    }
 }

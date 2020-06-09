@@ -11,18 +11,14 @@ package futureTrading.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import futureTrading.daos.TestDao;
-import futureTrading.entities.FuturesOrder;
 import futureTrading.entities.FuturesProduct;
 import futureTrading.entities.OrderInMD;
 import futureTrading.service.RedisService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-
 
 
 @Controller
@@ -49,7 +45,7 @@ public class TestController {
         System.out.println("arrive controller redis set! \n");
         System.out.println(jsonObject);
         JSONObject jso = jsonObject.getJSONObject("order");
-        redisService.setOrder(jsonObject.getString("key"), JSONObject.parseObject(String.valueOf(jso),OrderInMD.class));
+        redisService.setOrder(jsonObject.getString("key"), JSONObject.parseObject(String.valueOf(jso), OrderInMD.class));
     }
 
     @ResponseBody

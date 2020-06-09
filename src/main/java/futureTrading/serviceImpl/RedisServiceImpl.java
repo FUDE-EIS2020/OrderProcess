@@ -1,14 +1,8 @@
 package futureTrading.serviceImpl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import futureTrading.entities.OrderInMD;
 import futureTrading.service.RedisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,11 +23,10 @@ public class RedisServiceImpl implements RedisService {
 
         //stringRedisTemplate.opsForValue().set(key, String.valueOf(orderInMD));
         List<Object> list = redisTemplate.opsForValue().get(brokerID_productID);
-        if(list != null) {
+        if (list != null) {
             list.add(orderInMD);
             redisTemplate.opsForValue().set(brokerID_productID, list);
-        }
-        else {
+        } else {
             List<Object> newList = new ArrayList<Object>();
             newList.add(orderInMD);
             redisTemplate.opsForValue().set(brokerID_productID, newList);

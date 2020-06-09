@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.UUID;
 
 public class OrderInMD implements Serializable {
-    private UUID id;
+    private Long id;
     private Double price;
     private Integer amount;
     private Date createTime;
@@ -19,11 +19,11 @@ public class OrderInMD implements Serializable {
     // 表示这个是一个market order或者stop order，属性值为"M" or "S"
     private String tag;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
