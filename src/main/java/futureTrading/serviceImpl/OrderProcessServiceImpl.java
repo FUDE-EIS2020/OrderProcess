@@ -55,6 +55,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                 processLimitOrder(orderInMDDto, orderInMDDto.getBrokerId(), orderInMDDto.getProductId());
                 break;
             case "stop":
+                processStopOrder(orderInMDDto, orderInMDDto.getBrokerId(), orderInMDDto.getProductId());
                 break;
             case "cancel":
                 break;
@@ -83,14 +84,11 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         order.setAmount(amount);
         if (orderType.equals("market")) {
             order.setOrderType(FuturesOrder.OrderType.MARKET);
-        }
-        else if (orderType.equals("limit")) {
+        } else if (orderType.equals("limit")) {
             order.setOrderType(FuturesOrder.OrderType.LIMIT);
-        }
-        else if (orderType.equals("stop")) {
+        } else if (orderType.equals("stop")) {
             order.setOrderType(FuturesOrder.OrderType.STOP);
-        }
-        else {
+        } else {
             order.setOrderType(FuturesOrder.OrderType.CANCEL);
         }
         order.setOrderState(FuturesOrder.OrderState.FINISHED);
@@ -99,10 +97,9 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         order.setBroker(broker);
         order.setSeller(seller);
         order.setBuyer(buyer);
-        if (initiator.equals("buyer")){
+        if (initiator.equals("buyer")) {
             order.setInitiator(FuturesOrder.OrderInitiator.BUYER);
-        }
-        else {
+        } else {
             order.setInitiator(FuturesOrder.OrderInitiator.SELLER);
         }
 
@@ -229,6 +226,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                 break;
             default:
         }
+        processStopOrderAfterPriceFluctuation(brokerId, productId);
     }
 
     private void processLimitOrder(OrderInMDDto orderInMDDto, String brokerId, String productId) {
@@ -265,18 +263,16 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                             if (order.getAmount() > remainingAmount) {
                                 saveOrderTransaction(productId, order.getPrice(), remainingAmount, "limit",
                                         brokerId, orderInMDDto.getTraderId(), order.getTraderId(), "seller");
-                                order.setAmount(order.getAmount()-remainingAmount);
+                                order.setAmount(order.getAmount() - remainingAmount);
                                 remainingAmount = 0;
                                 break;
-                            }
-                            else if (order.getAmount().equals(remainingAmount)) {
+                            } else if (order.getAmount().equals(remainingAmount)) {
                                 saveOrderTransaction(productId, order.getPrice(), remainingAmount, "limit",
                                         brokerId, orderInMDDto.getTraderId(), order.getTraderId(), "seller");
                                 it.remove();
                                 remainingAmount = 0;
                                 break;
-                            }
-                            else {
+                            } else {
                                 remainingAmount = remainingAmount - order.getAmount();
                                 saveOrderTransaction(productId, order.getPrice(), order.getAmount(), "limit",
                                         brokerId, orderInMDDto.getTraderId(), order.getTraderId(), "seller");
@@ -332,21 +328,19 @@ public class OrderProcessServiceImpl implements OrderProcessService {
 
                         if (order.getAmount() > remainingAmount1) {
                             saveOrderTransaction(productId, order.getPrice(), remainingAmount1, "limit",
-                                    brokerId, order.getTraderId(), orderInMDDto.getTraderId(),"buyer");
-                            order.setAmount(order.getAmount()-remainingAmount1);
+                                    brokerId, order.getTraderId(), orderInMDDto.getTraderId(), "buyer");
+                            order.setAmount(order.getAmount() - remainingAmount1);
                             remainingAmount1 = 0;
                             break;
-                        }
-                        else if (order.getAmount().equals(remainingAmount1)) {
+                        } else if (order.getAmount().equals(remainingAmount1)) {
                             saveOrderTransaction(productId, order.getPrice(), remainingAmount1, "limit",
-                                    brokerId, order.getTraderId(), orderInMDDto.getTraderId(),"buyer");
+                                    brokerId, order.getTraderId(), orderInMDDto.getTraderId(), "buyer");
                             it1.remove();
                             remainingAmount1 = 0;
                             break;
-                        }
-                        else {
+                        } else {
                             saveOrderTransaction(productId, order.getPrice(), order.getAmount(), "limit",
-                                    brokerId, order.getTraderId(), orderInMDDto.getTraderId(),"buyer");
+                                    brokerId, order.getTraderId(), orderInMDDto.getTraderId(), "buyer");
                             remainingAmount1 = remainingAmount1 - order.getAmount();
                             it1.remove();
                         }
@@ -373,10 +367,167 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                 break;
             default:
         }
+        processStopOrderAfterPriceFluctuation(brokerId, productId);
     }
 
-    private void processStopOrder(OrderInMDDto orderInMDDto) {
+    private void processStopOrder(OrderInMDDto orderInMDDto, String brokerId, String productId) {
+        // 目前处理stop order的逻辑是 把接受到的stop order直接存到队列里，然后在别的订单处理结束后再看是否能够处理
+        OrderInMD orderInMD = new OrderInMD();
+        orderInMD.setId(idService.generate("orderInMD"));
+        orderInMD.setAmount(orderInMDDto.getAmount());
+        orderInMD.setPrice(orderInMDDto.getPrice());
+        orderInMD.setCreateTime(new Date());
+        orderInMD.setTag("S");
+        orderInMD.setTraderId(orderInMDDto.getTraderId());
+        if (orderInMDDto.getType().equals("buy")) {
+            orderInMD.setType("buy");
+        } else {
+            orderInMD.setType("sell");
+        }
+        List<OrderInMD> orderInMDS = redisService.getOrder(brokerId, productId);
+        orderInMDS.add(orderInMD);
+        redisService.setOrder(brokerId, productId, orderInMDS);
+    }
 
+    private void processStopOrderAfterPriceFluctuation(String brokerId, String productId) {
+        // 处理逻辑： 当价格发生变动后（就是有交易完成后），把所有排好序的stop order拿过来
+        // 看当前的市场价跟stop order里订单的价格比较
+        // 当前市场最高买价 大于等于 buy stop order时， 处理stop order
+        // 当前市场最低卖价 小于等于 sell stop order时， 处理stop order
+        List<OrderInMD> buyStopOrders = redisService.getStopOrdersInMD(brokerId, productId).get(0);
+        List<OrderInMD> sellStopOrders = redisService.getStopOrdersInMD(brokerId, productId).get(1);
+
+        List<OrderInMD> buyOrders = redisService.splitOrdersInMD(brokerId, productId).get(0);
+        List<OrderInMD> sellOrders = redisService.splitOrdersInMD(brokerId, productId).get(1);
+
+        if (buyOrders.size() == 0 || sellOrders.size() == 0) {
+            return;
+        }
+
+        if (buyStopOrders.size() == 0 && sellStopOrders.size() == 0) {
+            return;
+        }
+
+        if (buyStopOrders.size() != 0) {
+            if (sellOrders.get(0).getPrice() >= buyStopOrders.get(0).getPrice()) {
+                // 这种情况只修改队列里的卖单，先保留别的订单
+                List<OrderInMD> remainOrders = marketDepthService.getBuyOrdersInMD(brokerId, productId);
+                remainOrders.addAll(marketDepthService.getMarketOrdersInMD(brokerId, productId));
+                remainOrders.addAll(marketDepthService.getStopOrdersInMD(brokerId, productId));
+                // 记录下这笔订单的数量
+                OrderInMD currentOrder = buyStopOrders.get(0);
+                Integer remainingAmount = currentOrder.getAmount();
+                Iterator<OrderInMD> it = sellOrders.iterator();
+                while (it.hasNext()) {
+                    OrderInMD order = it.next();
+
+                    Integer amount = order.getAmount();
+                    if (amount > remainingAmount) {
+                        // 当订单可以满足这次的market order
+                        order.setAmount(amount - remainingAmount);
+                        saveOrderTransaction(productId, order.getPrice(), remainingAmount,
+                                "stop", brokerId, currentOrder.getTraderId(), order.getTraderId(),
+                                "seller");
+                        remainingAmount = 0;
+                        break;
+                    } else if (amount.equals(remainingAmount)) {
+                        saveOrderTransaction(productId, order.getPrice(), remainingAmount,
+                                "stop", brokerId, currentOrder.getTraderId(), order.getTraderId(),
+                                "seller");
+                        it.remove();
+//                        sellOrders.remove(order);
+                        remainingAmount = 0;
+
+                        break;
+                    } else {
+                        // 这个订单数量少，应该接着往下面进行， 别忘了最后修改remaining amount
+                        saveOrderTransaction(productId, order.getPrice(), order.getAmount(),
+                                "stop", brokerId, currentOrder.getTraderId(), order.getTraderId(),
+                                "seller");
+                        it.remove();
+                        remainingAmount = remainingAmount - order.getAmount();
+                    }
+                }
+                if (remainingAmount > 0) {
+                    // save market order
+                    OrderInMD orderInMD = new OrderInMD();
+                    orderInMD.setId(idService.generate("orderInMD"));
+                    orderInMD.setAmount(remainingAmount);
+                    orderInMD.setPrice(currentOrder.getPrice());
+                    orderInMD.setType("buy");
+                    orderInMD.setTag("S");
+                    orderInMD.setCreateTime(new Date());
+                    orderInMD.setTraderId(currentOrder.getTraderId());
+                    sellOrders.add(orderInMD);
+                }
+                // set orders in md
+                sellOrders.addAll(remainOrders);
+                redisService.setOrder(brokerId, productId, sellOrders);
+
+            }
+        }
+
+        if (sellStopOrders.size() != 0) {
+            if (buyOrders.get(0).getPrice() <= sellStopOrders.get(0).getPrice()) {
+//                List<OrderInMD> buyOrders = marketDepthService.getBuyOrdersInMD(brokerId, productId);
+                List<OrderInMD> remainOrders1 = marketDepthService.getSellOrdersInMD(brokerId, productId);
+                remainOrders1.addAll(marketDepthService.getMarketOrdersInMD(brokerId, productId));
+                remainOrders1.addAll(marketDepthService.getStopOrdersInMD(brokerId, productId));
+                // 记录这个订单的大小
+                OrderInMD currentOrder2 = sellStopOrders.get(0);
+                Integer remainingAmount1 = currentOrder2.getAmount();
+                Iterator<OrderInMD> it1 = buyOrders.iterator();
+                while (it1.hasNext()) {
+                    OrderInMD order = it1.next();
+
+                    Integer amount = order.getAmount();
+                    if (amount > remainingAmount1) {
+                        // 当订单可以满足这次的market order
+                        order.setAmount(amount - remainingAmount1);
+                        saveOrderTransaction(productId, order.getPrice(), remainingAmount1,
+                                "stop", brokerId, order.getTraderId(), currentOrder2.getTraderId(),
+                                "buyer");
+                        remainingAmount1 = 0;
+
+                        break;
+                    } else if (amount.equals(remainingAmount1)) {
+                        saveOrderTransaction(productId, order.getPrice(), remainingAmount1,
+                                "stop", brokerId, order.getTraderId(), currentOrder2.getTraderId(),
+                                "buyer");
+                        it1.remove();
+                        remainingAmount1 = 0;
+
+                        break;
+                    } else {
+                        // 这个订单数量少，应该接着往下面进行， 别忘了最后修改remaining amount
+                        saveOrderTransaction(productId, order.getPrice(), order.getAmount(),
+                                "stop", brokerId, order.getTraderId(), currentOrder2.getTraderId(),
+                                "buyer");
+                        it1.remove();
+                        remainingAmount1 = remainingAmount1 - order.getAmount();
+                    }
+                }
+
+                if (remainingAmount1 > 0) {
+                    // save market order
+                    OrderInMD orderInMD = new OrderInMD();
+                    orderInMD.setId(idService.generate("orderInMD"));
+                    orderInMD.setAmount(remainingAmount1);
+                    orderInMD.setPrice(currentOrder2.getPrice());
+                    orderInMD.setType("sell");
+                    orderInMD.setTag("S");
+                    orderInMD.setCreateTime(new Date());
+                    orderInMD.setTraderId(currentOrder2.getTraderId());
+                    buyOrders.add(orderInMD);
+                }
+                // set orders in md
+                buyOrders.addAll(remainOrders1);
+                redisService.setOrder(brokerId, productId, buyOrders);
+            }
+        }
+
+        // 处理一个订单后，如果有其他的stop order， 递归调用
+        processStopOrderAfterPriceFluctuation(brokerId, productId);
     }
 
     private void processCancelOrder() {
