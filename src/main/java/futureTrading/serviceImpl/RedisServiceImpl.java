@@ -1,11 +1,11 @@
 package futureTrading.serviceImpl;
 
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import futureTrading.entities.OrderInMD;
 import futureTrading.service.RedisService;
-import org.aspectj.weaver.ast.Or;
-import org.hibernate.criterion.Order;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -74,5 +74,42 @@ public class RedisServiceImpl implements RedisService {
         returnList.add(buyerOrderInMD);
         returnList.add(sellerOrderInMD);
         return returnList;
+    }
+
+    @Override
+    public JSONArray sendDataToFront(String brokerId, String productId) {
+        JSONArray data = new JSONArray();
+        JSONArray sellerArray = new JSONArray();
+        JSONArray buyerArray = new JSONArray();
+
+        List<List<OrderInMD>> splitList = splitOrdersInMD(brokerId, productId);
+        List<OrderInMD> buyerOrderInMD = splitList.get(0);
+        List<OrderInMD> sellerOrderInMD = splitList.get(1);
+        // todo: now we send all the data to front end
+        for (int i = sellerOrderInMD.size()-1; i >= 0; i--) {
+            JSONObject sellerOrder = (JSONObject) JSONObject.toJSON(sellerOrderInMD.get(i));
+            sellerOrder.remove("id");
+            sellerOrder.remove("createTime");
+            sellerOrder.remove("type");
+            sellerOrder.remove("tag");
+            sellerOrder.remove("traderId");
+            //sellerOrder.put("level", i);
+            sellerArray.add(sellerOrder);
+        }
+        for (int i = 0; i < buyerOrderInMD.size(); i++) {
+            //JSONObject buyerOrder = JSONObject.parseObject(buyerOrderInMD.get(i).toString());
+            JSONObject buyerOrder = (JSONObject) JSONObject.toJSON(buyerOrderInMD.get(i));
+            buyerOrder.remove("id");;
+            buyerOrder.remove("createTime");
+            buyerOrder.remove("type");
+            buyerOrder.remove("tag");
+            buyerOrder.remove("traderId");
+            //buyerOrder.put("level", i);
+            buyerArray.add(buyerOrder);
+        }
+
+        data.add(sellerArray);
+        data.add(buyerArray);
+        return data;
     }
 }

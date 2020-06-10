@@ -63,4 +63,11 @@ public class TestController {
         System.out.println("arrive controller redis split! \n");
         return redisService.splitOrdersInMD(key1,key2);
     }
+
+    @ResponseBody
+    @GetMapping(path = "/sendFront")
+    public JSONArray sendFront (@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
+        System.out.println("arrive controller sendFront! \n");
+        return redisService.sendDataToFront(key1, key2);
+    }
 }

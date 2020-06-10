@@ -1,5 +1,6 @@
 package futureTrading.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import futureTrading.entities.OrderInMD;
 
@@ -12,5 +13,7 @@ public interface RedisService {
     List<OrderInMD> getOrder(String brokerId, String productId);
 
     List<List<OrderInMD>> splitOrdersInMD(String brokerId, String productId);
+
+    JSONArray sendDataToFront(String brokerId, String productId);
 
 }
