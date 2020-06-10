@@ -1,62 +1,54 @@
 package futureTrading.entities;
 
-import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table
 public class Trader {
-  @Id
-  @GeneratedValue(generator = "UUID")
-  @GenericGenerator(
-      name = "UUID",
-      strategy = "org.hibernate.id.UUIDGenerator"
-  )
-  private UUID id;
+    @Id
+    private Long id;
 
-  @Column(nullable = false)
-  private String name;
+    @Column(nullable = false)
+    private String name;
 
-  @Column(nullable = false)
-  private  String token;
+    @Column(nullable = false)
+    private String token;
 
-  @Column(nullable = false)
-  private  String compName;
+    @Column(nullable = false)
+    private String compName;
 
-  public UUID getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(UUID id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getToken() {
-    return token;
-  }
+    public String getToken() {
+        return token;
+    }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-  public String getCompName() {
-    return compName;
-  }
+    public String getCompName() {
+        return compName;
+    }
 
-  public void setCompName(String compName) {
-    this.compName = compName;
-  }
+    public void setCompName(String compName) {
+        this.compName = compName;
+    }
 }

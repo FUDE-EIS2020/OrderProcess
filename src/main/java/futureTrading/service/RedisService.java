@@ -15,4 +15,5 @@ public interface RedisService {
     List<List<OrderInMD>> splitOrdersInMD(String brokerId, String productId);
 
     JSONArray sendDataToFront(String brokerId, String productId);
+
 }

@@ -1,62 +1,55 @@
 package futureTrading.entities;
 
-import java.util.List;
-import java.util.UUID;
 import javax.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
+import java.util.List;
 
 
 @Entity
 @Table
 public class Broker {
-  @Id
-  @GeneratedValue(generator = "UUID")
-  @GenericGenerator(
-      name = "UUID",
-      strategy = "org.hibernate.id.UUIDGenerator"
-  )
-  private UUID id;
+    @Id
+    private Long id;
 
-  @Column(nullable = false)
-  private String name;
+    @Column(nullable = false)
+    private String name;
 
-  @Column(nullable = false)
-  private  String token;
+    @Column(nullable = false)
+    private String token;
 
-  @OneToMany(cascade = CascadeType.MERGE,
-      fetch = FetchType.LAZY,
-      targetEntity=FuturesProduct.class)
-  private List<FuturesProduct> products;
+    @OneToMany(cascade = CascadeType.MERGE,
+            fetch = FetchType.LAZY,
+            targetEntity = FuturesProduct.class)
+    private List<FuturesProduct> products;
 
-  public UUID getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(UUID id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getToken() {
-    return token;
-  }
+    public String getToken() {
+        return token;
+    }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-  public List<FuturesProduct> getProducts() {
-    return products;
-  }
+    public List<FuturesProduct> getProducts() {
+        return products;
+    }
 
-  public void setProducts(List<FuturesProduct> products) {
-    this.products = products;
-  }
+    public void setProducts(List<FuturesProduct> products) {
+        this.products = products;
+    }
 }

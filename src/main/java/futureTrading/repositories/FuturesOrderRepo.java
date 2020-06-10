@@ -6,12 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
-public interface FuturesOrderRepo extends JpaRepository<FuturesOrder, String> {
+public interface FuturesOrderRepo extends JpaRepository<FuturesOrder, Long> {
 
-    FuturesOrder getById(UUID id);
+    FuturesOrder getById(Long id);
 
     List<FuturesOrder> findAllByOrderType(FuturesOrder.OrderType orderType);
 

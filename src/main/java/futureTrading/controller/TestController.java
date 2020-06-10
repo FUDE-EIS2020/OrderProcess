@@ -12,18 +12,14 @@ package futureTrading.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import futureTrading.daos.TestDao;
-import futureTrading.entities.FuturesOrder;
 import futureTrading.entities.FuturesProduct;
 import futureTrading.entities.OrderInMD;
 import futureTrading.service.RedisService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-
 
 
 @Controller
@@ -51,6 +47,7 @@ public class TestController {
         JSONArray jsonArray = jsonObject.getJSONArray("order");//jsonObject.getJSONObject("order");
         redisService.setOrder(jsonObject.getString("key1"), jsonObject.getString("key2"),
                 JSONObject.parseArray(jsonArray.toString(), OrderInMD.class));
+
     }
 
     @ResponseBody
@@ -65,5 +62,12 @@ public class TestController {
     public List<List<OrderInMD>> redisSplit(@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
         System.out.println("arrive controller redis split! \n");
         return redisService.splitOrdersInMD(key1,key2);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/sendFront")
+    public JSONArray sendFront (@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
+        System.out.println("arrive controller sendFront! \n");
+        return redisService.sendDataToFront(key1, key2);
     }
 }
