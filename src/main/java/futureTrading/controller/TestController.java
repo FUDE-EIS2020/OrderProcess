@@ -70,4 +70,18 @@ public class TestController {
         System.out.println("arrive controller sendFront! \n");
         return redisService.sendDataToFront(key1, key2);
     }
+
+    @ResponseBody
+    @GetMapping(path = "/getMarketOrder")
+    public List<List<OrderInMD>> getMarketOrdersInMD (@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
+        System.out.println("arrive controller getMarketOrder! \n");
+        return redisService.getMarketOrdersInMD(key1, key2);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/getStopOrder")
+    public List<List<OrderInMD>> getStopOrdersInMD (@RequestParam("key1") String key1, @RequestParam("key2") String key2) {
+        System.out.println("arrive controller getMarketOrder! \n");
+        return redisService.getStopOrdersInMD(key1, key2);
+    }
 }

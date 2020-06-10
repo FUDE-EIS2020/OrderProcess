@@ -80,6 +80,52 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public List<List<OrderInMD>> getMarketOrdersInMD(String brokerId, String productId) {
+        List<OrderInMD> allList = getOrder(brokerId, productId);
+        List<OrderInMD> sellerOrderInMD = new ArrayList<>();
+        List<OrderInMD> buyerOrderInMD = new ArrayList<>();
+        for (OrderInMD tmpOrder : allList) {
+            if (tmpOrder.getTag().equals("M")) {
+                if (tmpOrder.getType().equals("buy")) {
+                    buyerOrderInMD.add(tmpOrder);
+                }
+                else sellerOrderInMD.add(tmpOrder);
+            }
+        }
+
+        buyerOrderInMD.sort(new SortByPriceLH());
+        sellerOrderInMD.sort(new SortByPriceSH());
+
+        List<List<OrderInMD>> returnList = new ArrayList<>();
+        returnList.add(buyerOrderInMD);
+        returnList.add(sellerOrderInMD);
+        return returnList;
+    }
+
+    @Override
+    public List<List<OrderInMD>> getStopOrdersInMD(String brokerId, String productId) {
+        List<OrderInMD> allList = getOrder(brokerId, productId);
+        List<OrderInMD> sellerOrderInMD = new ArrayList<>();
+        List<OrderInMD> buyerOrderInMD = new ArrayList<>();
+        for (OrderInMD tmpOrder : allList) {
+            if (tmpOrder.getTag().equals("S")) {
+                if (tmpOrder.getType().equals("buy")) {
+                    buyerOrderInMD.add(tmpOrder);
+                }
+                else sellerOrderInMD.add(tmpOrder);
+            }
+        }
+
+        buyerOrderInMD.sort(new SortByPriceLH());
+        sellerOrderInMD.sort(new SortByPriceSH());
+
+        List<List<OrderInMD>> returnList = new ArrayList<>();
+        returnList.add(buyerOrderInMD);
+        returnList.add(sellerOrderInMD);
+        return returnList;
+    }
+
+    @Override
     public JSONArray sendDataToFront(String brokerId, String productId) {
         JSONArray data = new JSONArray();
         JSONArray sellerArray = new JSONArray();
