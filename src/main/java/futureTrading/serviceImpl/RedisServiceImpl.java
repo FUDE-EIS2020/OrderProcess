@@ -50,6 +50,9 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public List<OrderInMD> getOrder(String brokerId, String productId) {
         String key = brokerId + productId;
+        if (redisTemplate.opsForValue().get(key) == null){
+            return new ArrayList<>();
+        }
         return redisTemplate.opsForValue().get(key);
     }
 
