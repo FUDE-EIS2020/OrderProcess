@@ -15,6 +15,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -66,9 +67,6 @@ public class OrderProcessServiceImpl implements OrderProcessService {
     public void notifyGateWay() {
         kafkaTemplate.send("test", "order XX processed");
     }
-
-//    private void saveOrderTransaction() {
-//    }
 
     private void saveOrderTransaction(String productId, Double price, Integer amount, String orderType, String brokerId, String buyerId, String sellerId, String initiator) {
         FuturesProduct product = futuresProductRepo.getById(Long.parseLong(productId));
@@ -122,7 +120,10 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                 remainOrders.addAll(marketDepthService.getStopOrdersInMD(brokerId, productId));
                 // 记录下这笔订单的数量
                 Integer remainingAmount = orderInMDDto.getAmount();
-                for (OrderInMD order : sellOrders) {
+                Iterator<OrderInMD> it = sellOrders.iterator();
+                while (it.hasNext()) {
+                    OrderInMD order = it.next();
+
                     Integer amount = order.getAmount();
                     if (amount > remainingAmount) {
                         // 当订单可以满足这次的market order
@@ -137,16 +138,17 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                         saveOrderTransaction(orderInMDDto.getProductId(), order.getPrice(), remainingAmount,
                                 orderInMDDto.getOrderType(), orderInMDDto.getBrokerId(), orderInMDDto.getTraderId(), order.getTraderId(),
                                 "seller");
-                        sellOrders.remove(order);
+                        it.remove();
+//                        sellOrders.remove(order);
                         remainingAmount = 0;
 
                         break;
                     } else {
                         // 这个订单数量少，应该接着往下面进行， 别忘了最后修改remaining amount
-                        sellOrders.remove(order);
                         saveOrderTransaction(orderInMDDto.getProductId(), order.getPrice(), order.getAmount(),
                                 orderInMDDto.getOrderType(), orderInMDDto.getBrokerId(), orderInMDDto.getTraderId(), order.getTraderId(),
                                 "seller");
+                        it.remove();
                         remainingAmount = remainingAmount - order.getAmount();
                     }
                 }
@@ -176,7 +178,10 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                 remainOrders1.addAll(marketDepthService.getStopOrdersInMD(brokerId, productId));
                 // 记录这个订单的大小
                 Integer remainingAmount1 = orderInMDDto.getAmount();
-                for (OrderInMD order : buyOrders) {
+                Iterator<OrderInMD> it1 = buyOrders.iterator();
+                while (it1.hasNext()) {
+                    OrderInMD order = it1.next();
+
                     Integer amount = order.getAmount();
                     if (amount > remainingAmount1) {
                         // 当订单可以满足这次的market order
@@ -191,16 +196,16 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                         saveOrderTransaction(orderInMDDto.getProductId(), order.getPrice(), remainingAmount1,
                                 orderInMDDto.getOrderType(), orderInMDDto.getBrokerId(), order.getTraderId(), orderInMDDto.getTraderId(),
                                 "buyer");
-                        buyOrders.remove(order);
+                        it1.remove();
                         remainingAmount1 = 0;
 
                         break;
                     } else {
                         // 这个订单数量少，应该接着往下面进行， 别忘了最后修改remaining amount
-                        buyOrders.remove(order);
                         saveOrderTransaction(orderInMDDto.getProductId(), order.getPrice(), order.getAmount(),
                                 orderInMDDto.getOrderType(), orderInMDDto.getBrokerId(), order.getTraderId(), orderInMDDto.getTraderId(),
                                 "buyer");
+                        it1.remove();
                         remainingAmount1 = remainingAmount1 - order.getAmount();
                     }
                 }
@@ -251,7 +256,10 @@ public class OrderProcessServiceImpl implements OrderProcessService {
 
                     // 记录笔数
                     Integer remainingAmount = orderInMDDto.getAmount();
-                    for (OrderInMD order : sellOrders) {
+                    Iterator<OrderInMD> it = sellOrders.iterator();
+                    while (it.hasNext()) {
+                        OrderInMD order = it.next();
+
                         // 对于队列中所有的订单，把价格低于这次limit order的单全部买下来
                         if (order.getPrice() <= orderInMDDto.getPrice()) {
                             if (order.getAmount() > remainingAmount) {
@@ -264,7 +272,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                             else if (order.getAmount().equals(remainingAmount)) {
                                 saveOrderTransaction(productId, order.getPrice(), remainingAmount, "limit",
                                         brokerId, orderInMDDto.getTraderId(), order.getTraderId(), "seller");
-                                sellOrders.remove(order);
+                                it.remove();
                                 remainingAmount = 0;
                                 break;
                             }
@@ -272,7 +280,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                                 remainingAmount = remainingAmount - order.getAmount();
                                 saveOrderTransaction(productId, order.getPrice(), order.getAmount(), "limit",
                                         brokerId, orderInMDDto.getTraderId(), order.getTraderId(), "seller");
-                                sellOrders.remove(order);
+                                it.remove();
                             }
                         }
                     }
@@ -318,7 +326,10 @@ public class OrderProcessServiceImpl implements OrderProcessService {
 
                     // 记录笔数
                     Integer remainingAmount1 = orderInMDDto.getAmount();
-                    for (OrderInMD order:buyOrders) {
+                    Iterator<OrderInMD> it1 = buyOrders.iterator();
+                    while (it1.hasNext()) {
+                        OrderInMD order = it1.next();
+
                         if (order.getAmount() > remainingAmount1) {
                             saveOrderTransaction(productId, order.getPrice(), remainingAmount1, "limit",
                                     brokerId, order.getTraderId(), orderInMDDto.getTraderId(),"buyer");
@@ -329,7 +340,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                         else if (order.getAmount().equals(remainingAmount1)) {
                             saveOrderTransaction(productId, order.getPrice(), remainingAmount1, "limit",
                                     brokerId, order.getTraderId(), orderInMDDto.getTraderId(),"buyer");
-                            buyOrders.remove(order);
+                            it1.remove();
                             remainingAmount1 = 0;
                             break;
                         }
@@ -337,7 +348,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                             saveOrderTransaction(productId, order.getPrice(), order.getAmount(), "limit",
                                     brokerId, order.getTraderId(), orderInMDDto.getTraderId(),"buyer");
                             remainingAmount1 = remainingAmount1 - order.getAmount();
-                            buyOrders.remove(order);
+                            it1.remove();
                         }
                     }
 

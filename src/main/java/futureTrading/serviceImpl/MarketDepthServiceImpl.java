@@ -6,6 +6,7 @@ import futureTrading.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,11 +27,11 @@ public class MarketDepthServiceImpl implements MarketDepthService {
 
     @Override
     public List<OrderInMD> getMarketOrdersInMD(String brokerId, String productId) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public List<OrderInMD> getStopOrdersInMD(String brokerId, String productId) {
-        return null;
+        return new ArrayList<>();
     }
 }
