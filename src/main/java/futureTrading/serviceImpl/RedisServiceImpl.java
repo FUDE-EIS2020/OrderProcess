@@ -85,7 +85,7 @@ public class RedisServiceImpl implements RedisService {
         List<List<OrderInMD>> splitList = splitOrdersInMD(brokerId, productId);
         List<OrderInMD> buyerOrderInMD = splitList.get(0);
         List<OrderInMD> sellerOrderInMD = splitList.get(1);
-        // todo: now we send all the data to front end
+        // todo: now we send all the data to front end, front end decide how many level it need
         for (int i = sellerOrderInMD.size()-1; i >= 0; i--) {
             JSONObject sellerOrder = (JSONObject) JSONObject.toJSON(sellerOrderInMD.get(i));
             sellerOrder.remove("id");
@@ -97,7 +97,6 @@ public class RedisServiceImpl implements RedisService {
             sellerArray.add(sellerOrder);
         }
         for (int i = 0; i < buyerOrderInMD.size(); i++) {
-            //JSONObject buyerOrder = JSONObject.parseObject(buyerOrderInMD.get(i).toString());
             JSONObject buyerOrder = (JSONObject) JSONObject.toJSON(buyerOrderInMD.get(i));
             buyerOrder.remove("id");;
             buyerOrder.remove("createTime");
