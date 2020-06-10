@@ -1,11 +1,13 @@
 package futureTrading.serviceImpl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import futureTrading.entities.OrderInMD;
 import futureTrading.service.RedisService;
 import org.aspectj.weaver.ast.Or;
 import org.hibernate.criterion.Order;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -79,5 +81,12 @@ public class RedisServiceImpl implements RedisService {
         returnList.add(buyerOrderInMD);
         returnList.add(sellerOrderInMD);
         return returnList;
+    }
+
+    @Override
+    public JSONArray sendDataToFront(String brokerId, String productId) {
+        JSONArray data = new JSONArray();
+        List<List<OrderInMD>> splitList = splitOrdersInMD(brokerId, productId);
+        return data;
     }
 }
