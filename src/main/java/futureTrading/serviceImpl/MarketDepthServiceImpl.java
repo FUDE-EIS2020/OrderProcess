@@ -27,11 +27,15 @@ public class MarketDepthServiceImpl implements MarketDepthService {
 
     @Override
     public List<OrderInMD> getMarketOrdersInMD(String brokerId, String productId) {
-        return new ArrayList<>();
+        List<OrderInMD> orderInMDS1 = redisService.getMarketOrdersInMD(brokerId, productId).get(0);
+        orderInMDS1.addAll(redisService.getMarketOrdersInMD(brokerId, productId).get(1));
+        return orderInMDS1;
     }
 
     @Override
     public List<OrderInMD> getStopOrdersInMD(String brokerId, String productId) {
-        return new ArrayList<>();
+        List<OrderInMD> orderInMDS1 = redisService.getStopOrdersInMD(brokerId, productId).get(0);
+        orderInMDS1.addAll(redisService.getStopOrdersInMD(brokerId, productId).get(1));
+        return orderInMDS1;
     }
 }

@@ -19,6 +19,8 @@ public class OrderInMDDto {
     // 属性值"market" "limit" "stop" "cancel"
     private String orderType;
 
+    private String orderId;
+
     public String getProductId() {
         return productId;
     }
@@ -81,5 +83,13 @@ public class OrderInMDDto {
 
     public void setOrderType(String orderType) {
         this.orderType = orderType;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }
