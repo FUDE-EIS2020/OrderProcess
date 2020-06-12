@@ -3,9 +3,7 @@ package futureTrading.controller;
 import futureTrading.dto.OrderInMDDto;
 import futureTrading.service.OrderProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class OrderProcessController {
@@ -16,6 +14,13 @@ public class OrderProcessController {
     @PostMapping("/createOrder")
     public String createOrder(@RequestBody OrderInMDDto orderInMDDto) {
         orderProcessService.processOrder(orderInMDDto);
+        return "OK";
+    }
+
+    // only for test
+    @GetMapping("/clearMarketDepth")
+    public String clearMarketDepth(@RequestParam("brokerId") String brokerId, @RequestParam("productId")String productId) {
+        orderProcessService.clearMD(brokerId, productId);
         return "OK";
     }
 }

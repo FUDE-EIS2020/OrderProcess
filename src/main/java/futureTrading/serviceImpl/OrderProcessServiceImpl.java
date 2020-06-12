@@ -1,5 +1,6 @@
 package futureTrading.serviceImpl;
 
+import futureTrading.dto.CancelOrderRequest;
 import futureTrading.dto.OrderInMDDto;
 import futureTrading.entities.*;
 import futureTrading.repositories.BrokerRepo;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +60,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                 processStopOrder(orderInMDDto, orderInMDDto.getBrokerId(), orderInMDDto.getProductId());
                 break;
             case "cancel":
+                processCancelOrder(orderInMDDto, orderInMDDto.getBrokerId(), orderInMDDto.getProductId());
                 break;
             default:
         }
@@ -69,10 +72,13 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         kafkaTemplate.send("test", "order XX processed");
     }
 
+    @Override
+    public void clearMD(String brokerId, String productId) {
+        redisService.setOrder(brokerId, productId, new ArrayList<>());
+    }
+
     private void saveOrderTransaction(String productId, Double price, Integer amount, String orderType, String brokerId, String buyerId, String sellerId, String initiator) {
         FuturesProduct product = futuresProductRepo.getById(Long.parseLong(productId));
-        Trader seller = traderRepo.getById(Long.parseLong(sellerId));
-        Trader buyer = traderRepo.getById(Long.parseLong(buyerId));
         Broker broker = brokerRepo.getById(Long.parseLong(brokerId));
 
         Long orderId = idService.generate("futuresOrder");
@@ -95,8 +101,14 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         order.setCreateTime(new Date());
         order.setFinishTime(new Date());
         order.setBroker(broker);
-        order.setSeller(seller);
-        order.setBuyer(buyer);
+        if (buyerId != null) {
+            Trader buyer = traderRepo.getById(Long.parseLong(buyerId));
+            order.setBuyer(buyer);
+        }
+        if (sellerId != null) {
+            Trader seller = traderRepo.getById(Long.parseLong(sellerId));
+            order.setSeller(seller);
+        }
         if (initiator.equals("buyer")) {
             order.setInitiator(FuturesOrder.OrderInitiator.BUYER);
         } else {
@@ -408,14 +420,24 @@ public class OrderProcessServiceImpl implements OrderProcessService {
             return;
         }
 
+        if ( (buyStopOrders.size() == 0 || (buyStopOrders.size() != 0 && sellOrders.get(0).getPrice() < buyStopOrders.get(0).getPrice())) &&
+                (sellStopOrders.size() == 0 ||  (sellStopOrders.size() != 0 && buyOrders.get(0).getPrice() > sellStopOrders.get(0).getPrice()))) {
+            return;
+        }
+
         if (buyStopOrders.size() != 0) {
             if (sellOrders.get(0).getPrice() >= buyStopOrders.get(0).getPrice()) {
                 // 这种情况只修改队列里的卖单，先保留别的订单
                 List<OrderInMD> remainOrders = marketDepthService.getBuyOrdersInMD(brokerId, productId);
                 remainOrders.addAll(marketDepthService.getMarketOrdersInMD(brokerId, productId));
-                remainOrders.addAll(marketDepthService.getStopOrdersInMD(brokerId, productId));
+
                 // 记录下这笔订单的数量
                 OrderInMD currentOrder = buyStopOrders.get(0);
+
+                buyStopOrders.remove(0);
+                remainOrders.addAll(buyStopOrders);
+                remainOrders.addAll(sellStopOrders);
+
                 Integer remainingAmount = currentOrder.getAmount();
                 Iterator<OrderInMD> it = sellOrders.iterator();
                 while (it.hasNext()) {
@@ -472,9 +494,14 @@ public class OrderProcessServiceImpl implements OrderProcessService {
 //                List<OrderInMD> buyOrders = marketDepthService.getBuyOrdersInMD(brokerId, productId);
                 List<OrderInMD> remainOrders1 = marketDepthService.getSellOrdersInMD(brokerId, productId);
                 remainOrders1.addAll(marketDepthService.getMarketOrdersInMD(brokerId, productId));
-                remainOrders1.addAll(marketDepthService.getStopOrdersInMD(brokerId, productId));
+
                 // 记录这个订单的大小
                 OrderInMD currentOrder2 = sellStopOrders.get(0);
+
+                sellStopOrders.remove(0);
+                remainOrders1.addAll(buyStopOrders);
+                remainOrders1.addAll(sellStopOrders);
+
                 Integer remainingAmount1 = currentOrder2.getAmount();
                 Iterator<OrderInMD> it1 = buyOrders.iterator();
                 while (it1.hasNext()) {
@@ -530,7 +557,22 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         processStopOrderAfterPriceFluctuation(brokerId, productId);
     }
 
-    private void processCancelOrder() {
-
+    private void processCancelOrder(OrderInMDDto orderInMDDto, String brokerId, String productId) {
+        List<OrderInMD> orderInMDS = redisService.getOrder(brokerId, productId);
+        Iterator<OrderInMD> it = orderInMDS.iterator();
+        while (it.hasNext()) {
+            OrderInMD order = it.next();
+            if (order.getId().equals(Long.parseLong(orderInMDDto.getOrderId()))) {
+                if (order.getType().equals("buy")) {
+                    saveOrderTransaction(productId, order.getPrice(), order.getAmount(), "cancel", brokerId, order.getTraderId(), null, "buyer");
+                }
+                else {
+                    saveOrderTransaction(productId, order.getPrice(), order.getAmount(), "cancel", brokerId, null, order.getTraderId(), "seller");
+                }
+                it.remove();
+                break;
+            }
+        }
+        redisService.setOrder(brokerId, productId, orderInMDS);
     }
 }
