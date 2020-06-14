@@ -70,6 +70,8 @@ public class OrderProcessServiceImpl implements OrderProcessService {
     @Override
     public void notifyGateWay() {
         kafkaTemplate.send("test", "order XX processed");
+        //  port:8089
+        //  http  localhost:8089
     }
 
     @Override

@@ -2,6 +2,7 @@ package futureTrading.controller;
 
 import futureTrading.dto.OrderInMDDto;
 import futureTrading.service.OrderProcessService;
+import futureTrading.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,9 @@ public class OrderProcessController {
 
     @Autowired
     private OrderProcessService orderProcessService;
+
+    @Autowired
+    private RedisService redisService;
 
     @PostMapping("/createOrder")
     public String createOrder(@RequestBody OrderInMDDto orderInMDDto) {
@@ -23,4 +27,5 @@ public class OrderProcessController {
         orderProcessService.clearMD(brokerId, productId);
         return "OK";
     }
+
 }
