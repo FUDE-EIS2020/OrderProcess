@@ -1,6 +1,7 @@
 package futureTrading.serviceImpl;
 
 import futureTrading.dto.CancelOrderRequest;
+import futureTrading.dto.MarketDepthChangeMsg;
 import futureTrading.dto.OrderInMDDto;
 import futureTrading.entities.*;
 import futureTrading.repositories.BrokerRepo;
@@ -12,8 +13,10 @@ import futureTrading.service.MarketDepthService;
 import futureTrading.service.OrderProcessService;
 import futureTrading.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +50,9 @@ public class OrderProcessServiceImpl implements OrderProcessService {
     @Autowired
     private RedisService redisService;
 
+    @Value("${websocketServer}")
+    private String websocketServer;
+
     @Override
     public void processOrder(OrderInMDDto orderInMDDto) {
         switch (orderInMDDto.getOrderType()) {
@@ -68,8 +74,19 @@ public class OrderProcessServiceImpl implements OrderProcessService {
     }
 
     @Override
-    public void notifyGateWay() {
-        kafkaTemplate.send("test", "order XX processed");
+    public void notifyGateWay(String brokerId, String productId) {
+        MarketDepthChangeMsg changeMsg = new MarketDepthChangeMsg();
+        changeMsg.setBrokerId(brokerId);
+        changeMsg.setProductId(productId);
+        changeMsg.setMarketDepth(redisService.sendDataToFront(brokerId, productId));
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        // send msg to websocket server
+        String response = restTemplate.postForEntity(websocketServer, changeMsg, String.class).getBody();
+//        System.out.println(websocketServer);
+//        String response = restTemplate.getForEntity(websocketServer, String.class).getBody();
+        System.out.println(response);
     }
 
     @Override

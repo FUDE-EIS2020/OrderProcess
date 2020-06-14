@@ -1,8 +1,10 @@
 package futureTrading.controller;
 
 import futureTrading.dto.OrderInMDDto;
+import futureTrading.service.KafkaService;
 import futureTrading.service.OrderProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,10 +13,19 @@ public class OrderProcessController {
     @Autowired
     private OrderProcessService orderProcessService;
 
+    @Autowired
+    private KafkaService kafkaService;
+
+
     @PostMapping("/createOrder")
     public String createOrder(@RequestBody OrderInMDDto orderInMDDto) {
-        orderProcessService.processOrder(orderInMDDto);
-        return "OK";
+        Integer i = kafkaService.sendOrderRequestToKafka(orderInMDDto);
+        if (i == 0) {
+            return "OK";
+        }
+        else {
+            return "BAD REQUEST";
+        }
     }
 
     // only for test
