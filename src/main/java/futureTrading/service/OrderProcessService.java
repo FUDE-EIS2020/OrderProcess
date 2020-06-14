@@ -6,7 +6,7 @@ public interface OrderProcessService {
 
     void processOrder(OrderInMDDto orderInMDDto);
 
-    void notifyGateWay();
+    void notifyGateWay(String brokerId, String productId);
 
     // only for test
     void clearMD(String brokerId, String productId);

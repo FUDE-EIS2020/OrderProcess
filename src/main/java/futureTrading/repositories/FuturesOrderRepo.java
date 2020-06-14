@@ -2,6 +2,7 @@ package futureTrading.repositories;
 
 import futureTrading.entities.Broker;
 import futureTrading.entities.FuturesOrder;
+import futureTrading.entities.Trader;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,5 +22,9 @@ public interface FuturesOrderRepo extends JpaRepository<FuturesOrder, Long> {
     List<FuturesOrder> findAllByOrderTypeAndBroker(FuturesOrder.OrderType orderType, Broker broker);
 
     List<FuturesOrder> findAllByOrderStateAndBroker(FuturesOrder.OrderState orderState, Broker broker);
+
+    List<FuturesOrder> findAllBySeller(Trader trader);
+
+    List<FuturesOrder> findAllByBuyer(Trader trader);
 
 }

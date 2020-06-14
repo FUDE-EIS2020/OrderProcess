@@ -1,10 +1,17 @@
 package futureTrading.controller;
 
 import futureTrading.dto.OrderInMDDto;
+import futureTrading.entities.FuturesOrder;
+import futureTrading.entities.OrderInMD;
+import futureTrading.service.KafkaService;
+import futureTrading.service.OrderFinding;
 import futureTrading.service.OrderProcessService;
 import futureTrading.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class OrderProcessController {
@@ -14,11 +21,20 @@ public class OrderProcessController {
 
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private KafkaService kafkaService;
+    @Autowired
+    private OrderFinding orderFinding;
 
     @PostMapping("/createOrder")
     public String createOrder(@RequestBody OrderInMDDto orderInMDDto) {
-        orderProcessService.processOrder(orderInMDDto);
-        return "OK";
+        Integer i = kafkaService.sendOrderRequestToKafka(orderInMDDto);
+        if (i == 0) {
+            return "OK";
+        }
+        else {
+            return "BAD REQUEST";
+        }
     }
 
     // only for test
@@ -27,5 +43,27 @@ public class OrderProcessController {
         orderProcessService.clearMD(brokerId, productId);
         return "OK";
     }
+
+
+    @GetMapping("/getMyUnfinishedOrders")
+    public List<OrderInMD> getMyUnfinishedOrders(@RequestParam("traderId") String traderId, @RequestParam("brokerId") String brokerId, @RequestParam("productId")String productId) {
+        return orderFinding.getMyUnfinishedOrderInMD(traderId,brokerId,productId);
+    }
+
+    @GetMapping("/getAllMyFinishedOrders")
+    public List<FuturesOrder> getAllMyFinishedOrders(@RequestParam("traderId") Long traderId) {
+        return orderFinding.getAllFinishedOrdersInBroker(traderId);
+    }
+
+    @GetMapping("/getAllOrderInMD")
+    public List<OrderInMD> getAllOrderInMD(@RequestParam("brokerId") String brokerId, @RequestParam("productId")String productId) {
+        return orderFinding.getAllOrderInMD(brokerId,productId);
+    }
+
+    @GetMapping("/getMyUnfinishedOrders")
+    public List<FuturesOrder> getAllFinishedOrdersInBroker(@RequestParam("brokerId") Long brokerId) {
+        return orderFinding.getAllFinishedOrdersInBroker(brokerId);
+    }
+
 
 }
