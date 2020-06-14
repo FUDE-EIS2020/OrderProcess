@@ -1,0 +1,51 @@
+kind: pipeline
+name: fude user
+
+steps:
+  - name: test
+    image: openjdk:8-jdk-alpine
+    volumes:
+      - name: maven-cache
+        path: /root/.m2
+    commands:
+      - sleep 15
+      - chmod +x ./mvnw && ./mvnw clean package -Dspring.profiles.active=product
+    when:
+      branch:
+        - master
+        - master-*
+        - develop
+        - fix-*
+
+  - name: docker
+    image: plugins/docker
+    settings:
+      username: chuyuxuan
+      password: chu000318
+      repo: chuyuxuan/fude-order-process
+      tags:
+        - 1.0.0
+    when:
+      branch:
+        - master-*
+#services:
+#  - name: mongo
+#    image: mongo:3.4
+#    command: [ --smallfiles ]
+#    ports:
+#      - 27017
+#  - name: redis
+#    image: redis
+services:
+  - name: database
+    image: mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: fude
+  - name: redis
+    image: redis
+
+volumes:
+  - name: maven-cache
+    host:
+      path: /maven-cache

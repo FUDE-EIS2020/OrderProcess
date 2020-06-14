@@ -31,8 +31,9 @@ public class KafkaConsumer {
                 // process order
                 orderProcessService.processOrder(dto);
                 // notify gateway after processing
-                orderProcessService.notifyGateWay();
+                orderProcessService.notifyGateWay(dto.getBrokerId(), dto.getProductId());
             } catch (Exception e) {
+                e.printStackTrace();
                 System.out.println("process order error");
             }
             System.out.println("receiving: " + msg);

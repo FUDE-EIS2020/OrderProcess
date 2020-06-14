@@ -18,9 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("local")
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
+//@ActiveProfiles("local")
 public class AddDataTests {
     @Autowired
     private BrokerRepo brokerRepo;
@@ -34,7 +34,6 @@ public class AddDataTests {
     @Autowired
     private IDService idService;
 
-    @Test
     public void addProduct() {
         FuturesProduct product = new FuturesProduct();
         product.setName("GOLD");
@@ -64,7 +63,7 @@ public class AddDataTests {
         brokerRepo.save(broker1);
     }
 
-    @Test
+
     public void addTrader() {
         Trader trader = new Trader();
         trader.setCompName("MS");
@@ -85,7 +84,6 @@ public class AddDataTests {
         traderRepo.save(trader2);
     }
 
-    @Test
     public void getAllUUID() {
         /*
         * traders   71bbb202-b433-4ee3-a444-ffd56794aeed
