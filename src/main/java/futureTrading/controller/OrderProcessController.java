@@ -1,5 +1,6 @@
 package futureTrading.controller;
 
+import futureTrading.dto.AllProductsPrice;
 import futureTrading.dto.OrderInMDDto;
 import futureTrading.entities.FuturesOrder;
 import futureTrading.entities.OrderInMD;
@@ -43,6 +44,10 @@ public class OrderProcessController {
         return "OK";
     }
 
+    @GetMapping("/prices")
+    public AllProductsPrice getProductPrices() {
+        return null;
+    }
 
     @GetMapping("/getMyUnfinishedOrders")
     public List<OrderInMD> getMyUnfinishedOrders(@RequestParam("traderId") String traderId, @RequestParam("brokerId") String brokerId, @RequestParam("productId")String productId) {
@@ -63,6 +68,5 @@ public class OrderProcessController {
     public List<FuturesOrder> getAllFinishedOrdersInBroker(@RequestParam("brokerId") Long brokerId) {
         return orderFinding.getAllFinishedOrdersInBroker(brokerId);
     }
-
 
 }
