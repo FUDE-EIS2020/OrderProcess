@@ -1,7 +1,10 @@
 package futureTrading.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import futureTrading.dto.AllProductsPrice;
+import futureTrading.dto.BrokerHistoryOrder;
 import futureTrading.dto.OrderInMDDto;
+import futureTrading.dto.TraderHistoryOrder;
 import futureTrading.entities.FuturesOrder;
 import futureTrading.entities.OrderInMD;
 import futureTrading.service.KafkaService;
@@ -54,11 +57,15 @@ public class OrderProcessController {
         return orderFinding.getMyUnfinishedOrderInMD(traderId,brokerId,productId);
     }
 
+    // get ALL ORDER: ALL TYPES return all orders
+    // init?
+
     @GetMapping("/getAllMyFinishedOrders")
     public List<FuturesOrder> getAllMyFinishedOrders(@RequestParam("traderId") Long traderId) {
         return orderFinding.getAllFinishedOrdersInBroker(traderId);
     }
 
+    // return all orders from this broker
     @GetMapping("/getAllOrderInMD")
     public List<OrderInMD> getAllOrderInMD(@RequestParam("brokerId") String brokerId, @RequestParam("productId")String productId) {
         return orderFinding.getAllOrderInMD(brokerId,productId);
@@ -67,6 +74,25 @@ public class OrderProcessController {
     @GetMapping("/getAllFinishedOrdersInBroker")
     public List<FuturesOrder> getAllFinishedOrdersInBroker(@RequestParam("brokerId") Long brokerId) {
         return orderFinding.getAllFinishedOrdersInBroker(brokerId);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/sendFront")
+    public JSONArray sendFront (@RequestParam("brokerId") String brokerId, @RequestParam("productId")String productId) {
+        System.out.println("arrive controller sendFront! \n");
+        return redisService.sendDataToFront(brokerId, productId);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/traderOrderHistory")
+    public List<TraderHistoryOrder> traderHistoryOrders(@RequestParam("traderId") Long traderId) {
+        return orderFinding.getTraderHistory(traderId);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/brokerOrderHistory")
+    public List<BrokerHistoryOrder> brokerHistoryOrders(@RequestParam("brokerId") Long brokerId) {
+        return orderFinding.getBrokerHistory(brokerId);
     }
 
 }

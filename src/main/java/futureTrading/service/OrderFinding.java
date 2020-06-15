@@ -1,5 +1,7 @@
 package futureTrading.service;
 
+import futureTrading.dto.TraderHistoryOrder;
+import futureTrading.dto.BrokerHistoryOrder;
 import futureTrading.entities.FuturesOrder;
 import futureTrading.entities.OrderInMD;
 
@@ -19,5 +21,9 @@ public interface OrderFinding {
     List<OrderInMD> getAllOrderInMD(String brokerId, String productId);
 
     List<FuturesOrder> getAllFinishedOrdersInBroker(Long brokerId);
+
+    List<TraderHistoryOrder> getTraderHistory(Long traderId);
+
+    List<BrokerHistoryOrder> getBrokerHistory(Long brokerId);
 
 }
