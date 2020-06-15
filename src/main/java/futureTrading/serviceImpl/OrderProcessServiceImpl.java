@@ -158,6 +158,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     if (amount > remainingAmount) {
                         // 当订单可以满足这次的market order
                         order.setAmount(amount - remainingAmount);
+                        order.setLastUpdate(new Date());
                         saveOrderTransaction(orderInMDDto.getProductId(), order.getPrice(), remainingAmount,
                                 orderInMDDto.getOrderType(), orderInMDDto.getBrokerId(), orderInMDDto.getTraderId(), order.getTraderId(),
                                 "seller");
@@ -192,6 +193,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     orderInMD.setType("buy");
                     orderInMD.setTag("M");
                     orderInMD.setCreateTime(new Date());
+                    orderInMD.setLastUpdate(new Date());
                     orderInMD.setTraderId(orderInMDDto.getTraderId());
                     sellOrders.add(orderInMD);
                 }
@@ -216,6 +218,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     if (amount > remainingAmount1) {
                         // 当订单可以满足这次的market order
                         order.setAmount(amount - remainingAmount1);
+                        order.setLastUpdate(new Date());
                         saveOrderTransaction(orderInMDDto.getProductId(), order.getPrice(), remainingAmount1,
                                 orderInMDDto.getOrderType(), orderInMDDto.getBrokerId(), order.getTraderId(), orderInMDDto.getTraderId(),
                                 "buyer");
@@ -249,6 +252,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     orderInMD.setType("sell");
                     orderInMD.setTag("M");
                     orderInMD.setCreateTime(new Date());
+                    orderInMD.setLastUpdate(new Date());
                     orderInMD.setTraderId(orderInMDDto.getTraderId());
                     buyOrders.add(orderInMD);
                 }
@@ -274,6 +278,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     orderInMD.setAmount(orderInMDDto.getAmount());
                     orderInMD.setPrice(orderInMDDto.getPrice());
                     orderInMD.setCreateTime(new Date());
+                    orderInMD.setLastUpdate(new Date());
                     orderInMD.setTag("");
                     orderInMD.setTraderId(orderInMDDto.getTraderId());
                     orderInMD.setType("buy");
@@ -297,6 +302,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                                 saveOrderTransaction(productId, order.getPrice(), remainingAmount, "limit",
                                         brokerId, orderInMDDto.getTraderId(), order.getTraderId(), "seller");
                                 order.setAmount(order.getAmount() - remainingAmount);
+                                order.setLastUpdate(new Date());
                                 remainingAmount = 0;
                                 break;
                             } else if (order.getAmount().equals(remainingAmount)) {
@@ -323,6 +329,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                         orderInMD.setType("buy");
                         orderInMD.setTag("");
                         orderInMD.setCreateTime(new Date());
+                        orderInMD.setLastUpdate(new Date());
                         orderInMD.setTraderId(orderInMDDto.getTraderId());
 
                         buyOrders.add(orderInMD);
@@ -342,6 +349,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     orderInMD.setAmount(orderInMDDto.getAmount());
                     orderInMD.setPrice(orderInMDDto.getPrice());
                     orderInMD.setCreateTime(new Date());
+                    orderInMD.setLastUpdate(new Date());
                     orderInMD.setTag("");
                     orderInMD.setTraderId(orderInMDDto.getTraderId());
                     orderInMD.setType("sell");
@@ -363,6 +371,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                             saveOrderTransaction(productId, order.getPrice(), remainingAmount1, "limit",
                                     brokerId, order.getTraderId(), orderInMDDto.getTraderId(), "buyer");
                             order.setAmount(order.getAmount() - remainingAmount1);
+                            order.setLastUpdate(new Date());
                             remainingAmount1 = 0;
                             break;
                         } else if (order.getAmount().equals(remainingAmount1)) {
@@ -387,6 +396,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                         orderInMD.setType("sell");
                         orderInMD.setTag("");
                         orderInMD.setCreateTime(new Date());
+                        orderInMD.setLastUpdate(new Date());
                         orderInMD.setTraderId(orderInMDDto.getTraderId());
 
                         sellOrders.add(orderInMD);
@@ -410,6 +420,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         orderInMD.setAmount(orderInMDDto.getAmount());
         orderInMD.setPrice(orderInMDDto.getPrice());
         orderInMD.setCreateTime(new Date());
+        orderInMD.setLastUpdate(new Date());
         orderInMD.setTag("S");
         orderInMD.setTraderId(orderInMDDto.getTraderId());
         if (orderInMDDto.getType().equals("buy")) {
@@ -468,6 +479,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     if (amount > remainingAmount) {
                         // 当订单可以满足这次的market order
                         order.setAmount(amount - remainingAmount);
+                        order.setLastUpdate(new Date());
                         saveOrderTransaction(productId, order.getPrice(), remainingAmount,
                                 "stop", brokerId, currentOrder.getTraderId(), order.getTraderId(),
                                 "seller");
@@ -500,6 +512,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     orderInMD.setType("buy");
                     orderInMD.setTag("S");
                     orderInMD.setCreateTime(new Date());
+                    orderInMD.setLastUpdate(new Date());
                     orderInMD.setTraderId(currentOrder.getTraderId());
                     sellOrders.add(orderInMD);
                 }
@@ -532,6 +545,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     if (amount > remainingAmount1) {
                         // 当订单可以满足这次的market order
                         order.setAmount(amount - remainingAmount1);
+                        order.setLastUpdate(new Date());
                         saveOrderTransaction(productId, order.getPrice(), remainingAmount1,
                                 "stop", brokerId, order.getTraderId(), currentOrder2.getTraderId(),
                                 "buyer");
@@ -565,6 +579,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
                     orderInMD.setType("sell");
                     orderInMD.setTag("S");
                     orderInMD.setCreateTime(new Date());
+                    orderInMD.setLastUpdate(new Date());
                     orderInMD.setTraderId(currentOrder2.getTraderId());
                     buyOrders.add(orderInMD);
                 }
