@@ -1,5 +1,6 @@
 package futureTrading.service;
 
+import futureTrading.dto.ProductPrice;
 import futureTrading.entities.OrderInMD;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface MarketDepthService {
     List<OrderInMD> getMarketOrdersInMD(String brokerId, String productId);
 
     List<OrderInMD> getStopOrdersInMD(String brokerId, String productId);
+
+    List<ProductPrice> getAllProductPrice();
 
 }
