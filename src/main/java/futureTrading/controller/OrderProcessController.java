@@ -1,5 +1,6 @@
 package futureTrading.controller;
 
+import futureTrading.dto.AllProductsPrice;
 import futureTrading.dto.OrderInMDDto;
 import futureTrading.service.KafkaService;
 import futureTrading.service.OrderProcessService;
@@ -33,5 +34,10 @@ public class OrderProcessController {
     public String clearMarketDepth(@RequestParam("brokerId") String brokerId, @RequestParam("productId")String productId) {
         orderProcessService.clearMD(brokerId, productId);
         return "OK";
+    }
+
+    @GetMapping("/prices")
+    public AllProductsPrice getProductPrices() {
+        return null;
     }
 }

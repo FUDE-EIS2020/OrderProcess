@@ -79,6 +79,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         changeMsg.setBrokerId(brokerId);
         changeMsg.setProductId(productId);
         changeMsg.setMarketDepth(redisService.sendDataToFront(brokerId, productId));
+        changeMsg.setLastUpdate(new Date());
 
         RestTemplate restTemplate = new RestTemplate();
 
