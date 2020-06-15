@@ -18,7 +18,6 @@ public class OrderProcessController {
 
     @Autowired
     private OrderProcessService orderProcessService;
-
     @Autowired
     private RedisService redisService;
     @Autowired
@@ -60,7 +59,7 @@ public class OrderProcessController {
         return orderFinding.getAllOrderInMD(brokerId,productId);
     }
 
-    @GetMapping("/getMyUnfinishedOrders")
+    @GetMapping("/getAllFinishedOrdersInBroker")
     public List<FuturesOrder> getAllFinishedOrdersInBroker(@RequestParam("brokerId") Long brokerId) {
         return orderFinding.getAllFinishedOrdersInBroker(brokerId);
     }
