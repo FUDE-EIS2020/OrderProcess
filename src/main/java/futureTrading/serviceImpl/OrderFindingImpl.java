@@ -130,7 +130,8 @@ public class OrderFindingImpl implements OrderFinding {
         List<FuturesOrder> finishedSellOrders = futuresOrderRepo.findAllBySeller(trader);
         for (FuturesOrder order:finishedSellOrders) {
             TraderHistoryOrder traderHistoryOrder = new TraderHistoryOrder();
-            traderHistoryOrder.setProductName(order.getProduct().getName());
+            traderHistoryOrder.setProductName(order.getProduct().getName()+" "+order.getProduct().getPeriod());
+            //traderHistoryOrder.setProductName(order.getProduct().getName());
             traderHistoryOrder.setBroker(order.getBroker().getName());
             traderHistoryOrder.setOrderType(order.getOrderType().name());
             traderHistoryOrder.setPrice(order.getPrice());
