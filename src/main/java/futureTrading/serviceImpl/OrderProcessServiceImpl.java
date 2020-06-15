@@ -74,6 +74,7 @@ public class OrderProcessServiceImpl implements OrderProcessService {
     }
 
     @Override
+
     public void notifyGateWay(String brokerId, String productId) {
         MarketDepthChangeMsg changeMsg = new MarketDepthChangeMsg();
         changeMsg.setBrokerId(brokerId);
