@@ -91,12 +91,15 @@ public class OrderFindingImpl implements OrderFinding {
                 default:
                     traderHistoryOrder.setOrderType("Limit Order");
             }
-            traderHistoryOrder.setProductName(futuresProduct.getName());
+            traderHistoryOrder.setProductName(futuresProduct.getName() + " " + futuresProduct.getPeriod());
             traderHistoryOrder.setPrice(order.getPrice());
             traderHistoryOrder.setVolume(order.getAmount());
             traderHistoryOrder.setState("Pending");
             traderHistoryOrder.setUpdateTime(order.getCreateTime().toString());
             traderHistoryOrders.add(traderHistoryOrder);
+            traderHistoryOrder.setBrokerId(brokerId);
+            traderHistoryOrder.setProductId(productId);
+            traderHistoryOrder.setOrderId(order.getId());
         }
         return traderHistoryOrders;
     }
@@ -110,7 +113,7 @@ public class OrderFindingImpl implements OrderFinding {
         List<FuturesOrder> finishedBuyOrders = futuresOrderRepo.findAllByBuyer(trader);
         for (FuturesOrder order:finishedBuyOrders) {
             TraderHistoryOrder traderHistoryOrder = new TraderHistoryOrder();
-            traderHistoryOrder.setProductName(order.getProduct().getName());
+            traderHistoryOrder.setProductName(order.getProduct().getName()+" "+order.getProduct().getPeriod());
             traderHistoryOrder.setBroker(order.getBroker().getName());
             traderHistoryOrder.setOrderType(order.getOrderType().name());
             traderHistoryOrder.setPrice(order.getPrice());
@@ -118,7 +121,10 @@ public class OrderFindingImpl implements OrderFinding {
             traderHistoryOrder.setState("Finished");
             traderHistoryOrder.setUpdateTime(order.getFinishTime().toString());
             traderHistoryOrder.setBuyOrSell("Buy");
+            traderHistoryOrder.setProductId(order.getProduct().getId());
+            traderHistoryOrder.setBrokerId(order.getBroker().getId());
             traderHistoryOrders.add(traderHistoryOrder);
+
         }
 
         List<FuturesOrder> finishedSellOrders = futuresOrderRepo.findAllBySeller(trader);

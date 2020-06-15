@@ -25,6 +25,33 @@ public class TraderHistoryOrder {
     private int volume;
     private double price;
     private double totalPrice;
+    private Long productId;
+    private Long brokerId;
+    private Long orderId;
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public void setBrokerId(Long brokerId) {
+        this.brokerId = brokerId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public Long getBrokerId() {
+        return brokerId;
+    }
+
+    public Long getOrderId() {
+        return orderId;
+    }
 
     public String getProductName() {
         return productName;
