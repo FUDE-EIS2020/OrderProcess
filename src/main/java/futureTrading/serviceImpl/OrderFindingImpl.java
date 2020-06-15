@@ -177,16 +177,23 @@ public class OrderFindingImpl implements OrderFinding {
         for (FuturesOrder order:ordersInMySQL) {
             BrokerHistoryOrder brokerHistoryOrder = new BrokerHistoryOrder();
             brokerHistoryOrder.setProductName(order.getProduct().getName());
+            if (order.getOrderType() == FuturesOrder.OrderType.CANCEL) {
+                brokerHistoryOrder.setOrderType("Cancel");
+            }
             //brokerHistoryOrder.setSeller(order.getInitiator().name());
             if (order.getInitiator().equals(FuturesOrder.OrderInitiator.SELLER)) {
-                brokerHistoryOrder.setSeller(order.getSeller().getName());
-                brokerHistoryOrder.setSellerComp(order.getSeller().getCompName());
-                brokerHistoryOrder.setBuyOrSell("Sell");
+                if (order.getSeller()!=null) {
+                    brokerHistoryOrder.setSeller(order.getSeller().getName());
+                    brokerHistoryOrder.setSellerComp(order.getSeller().getCompName());
+                    brokerHistoryOrder.setBuyOrSell("Sell");
+                }
             }
             else {
-                brokerHistoryOrder.setSeller(order.getBuyer().getName());
-                brokerHistoryOrder.setSellerComp(order.getBuyer().getCompName());
-                brokerHistoryOrder.setBuyOrSell("Buy");
+                if (order.getBuyer()!=null) {
+                    brokerHistoryOrder.setSeller(order.getBuyer().getName());
+                    brokerHistoryOrder.setSellerComp(order.getBuyer().getCompName());
+                    brokerHistoryOrder.setBuyOrSell("Buy");
+                }
             }
             brokerHistoryOrder.setPrice(order.getPrice());
             brokerHistoryOrder.setVolume(order.getAmount());
