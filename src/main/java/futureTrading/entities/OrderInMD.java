@@ -19,6 +19,8 @@ public class OrderInMD implements Serializable {
     // 表示这个是一个market order或者stop order，属性值为"M" or "S"
     private String tag;
 
+    private Date lastUpdate;
+
     public Long getId() {
         return id;
     }
@@ -73,5 +75,13 @@ public class OrderInMD implements Serializable {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

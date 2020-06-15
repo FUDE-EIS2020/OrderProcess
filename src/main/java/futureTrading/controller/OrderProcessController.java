@@ -1,16 +1,10 @@
 package futureTrading.controller;
 
 import com.alibaba.fastjson.JSONArray;
-import futureTrading.dto.AllProductsPrice;
-import futureTrading.dto.BrokerHistoryOrder;
-import futureTrading.dto.OrderInMDDto;
-import futureTrading.dto.TraderHistoryOrder;
+import futureTrading.dto.*;
 import futureTrading.entities.FuturesOrder;
 import futureTrading.entities.OrderInMD;
-import futureTrading.service.KafkaService;
-import futureTrading.service.OrderFinding;
-import futureTrading.service.OrderProcessService;
-import futureTrading.service.RedisService;
+import futureTrading.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +22,8 @@ public class OrderProcessController {
     private KafkaService kafkaService;
     @Autowired
     private OrderFinding orderFinding;
+    @Autowired
+    private MarketDepthService marketDepthService;
 
     @PostMapping("/createOrder")
     public String createOrder(@RequestBody OrderInMDDto orderInMDDto) {
@@ -48,8 +44,8 @@ public class OrderProcessController {
     }
 
     @GetMapping("/prices")
-    public AllProductsPrice getProductPrices() {
-        return null;
+    public List<ProductPrice> getProductPrices() {
+        return marketDepthService.getAllProductPrice();
     }
 
     @GetMapping("/getMyUnfinishedOrders")

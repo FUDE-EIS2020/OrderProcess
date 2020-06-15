@@ -16,7 +16,7 @@ public class KafkaConsumer {
     @Autowired
     private OrderProcessService orderProcessService;
 
-    @KafkaListener(topics = "testTopic", groupId = "test-group")
+    @KafkaListener(topics = "createOrder", groupId = "orderProcessBE")
     public void consumer(ConsumerRecord consumerRecord) {
         Optional<Object> kafkaMassage = Optional.ofNullable(consumerRecord.value());
         if (kafkaMassage.isPresent()) {

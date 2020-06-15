@@ -8,6 +8,9 @@ public class ProductPrice {
     private Double sellPrice;
     private Double buyPrice;
     private Date lastUpdate;
+    private String brokerName;
+    private String productName;
+    private String productPeriod;
 
     public String getProductId() {
         return productId;
@@ -47,5 +50,29 @@ public class ProductPrice {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    public void setBrokerName(String brokerName) {
+        this.brokerName = brokerName;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getProductPeriod() {
+        return productPeriod;
+    }
+
+    public void setProductPeriod(String productPeriod) {
+        this.productPeriod = productPeriod;
     }
 }
