@@ -86,7 +86,9 @@ public class OrderProcessServiceImpl implements OrderProcessService {
 
         // send msg to websocket server
         String response = restTemplate.postForEntity(websocketServer, changeMsg, String.class).getBody();
-//        System.out.println(websocketServer);
+
+        System.out.println("123+websocketServer");
+        System.out.println(websocketServer);
 //        String response = restTemplate.getForEntity(websocketServer, String.class).getBody();
         System.out.println(response);
     }

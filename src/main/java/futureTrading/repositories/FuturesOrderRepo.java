@@ -27,4 +27,5 @@ public interface FuturesOrderRepo extends JpaRepository<FuturesOrder, Long> {
 
     List<FuturesOrder> findAllByBuyer(Trader trader);
 
+
 }
