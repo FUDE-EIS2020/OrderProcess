@@ -17,7 +17,8 @@ public class KafkaServiceImpl implements KafkaService {
     public int sendOrderRequestToKafka(OrderInMDDto orderInMDDto) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            kafkaTemplate.send("testTopic", mapper.writeValueAsString(orderInMDDto));
+            System.out.println("send to kafka topic: " + mapper.writeValueAsString(orderInMDDto));
+            kafkaTemplate.send("createOrder", mapper.writeValueAsString(orderInMDDto));
             return 0;
         }
         catch (Exception e) {
